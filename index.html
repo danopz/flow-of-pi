@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+        <title>Flow of Pi</title>
+    </head>
+    <body class="bg-dark">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-6">
+                    <svg id="graph" xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 5000 5000"></svg>
+                </div>
+                <div class="col-6"></div>
+            </div>
+        </div>
+        
+
+        <script src="pi.js"></script>
+        <script>
+            var graph = document.getElementById('graph');
+
+            // max number of occurences per number
+            var steps = piNumbers.reduce(function(acc, curr){
+                if (typeof acc !== 'object') {
+                    acc = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                }
+
+                acc[curr]++;
+
+                return acc;
+            }).reduce(function(max, curr) {
+                return max < curr ? curr : max;
+            });
+
+            var marginDegs = 1;
+            var degsPerNumber = 36 - 2*marginDegs;
+            var radius = 2500;
+            var size = 5000;
+            var halfSize = size / 2;
+
+            var littleRadius = radius / 4;
+
+            var step = degsPerNumber / steps;
+
+            var colors = [
+                '#5c2f17',
+                '#e48a4a',
+                '#4e1d80',
+                '#c764ce',
+                '#056366',
+                '#1de3db',
+                '#033f91',
+                '#077df6',
+                '#2e4720',
+                '#94c362'
+            ];
+
+            // var debugDot = function(x, y, color) {
+            //     if (color == undefined) {
+            //         color = 'black';
+            //     }
+
+            //     var ci = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            //     ci.setAttribute('cx', x);
+            //     ci.setAttribute('cy', y);
+            //     ci.setAttribute('r', 30);
+            //     ci.setAttribute('fill', color);
+            //     ci.setAttribute('stroke', color);
+            //     graph.appendChild(ci);
+            // };
+
+            var lastPt = null;
+            var currStep = -1;
+
+            piNumbers.forEach(function (number) {
+                currStep = (currStep + 1) % steps;
+                var angle = number * (degsPerNumber+2*marginDegs) + currStep * step - 90;
+                var radian = angle * Math.PI / 180;
+
+                var x = halfSize + Math.cos(radian) * radius;
+                var y = halfSize + Math.sin(radian) * radius;
+
+                if (lastPt !== null) {
+                    var nx = (lastPt[0] + x) / 2;
+                    var ny = (lastPt[1] + y) / 2;
+
+                    var cubicRadian = Math.atan2(ny - halfSize, nx - halfSize);
+                    var cubicX = halfSize + Math.cos(cubicRadian) * littleRadius;
+                    var cubicY = halfSize + Math.sin(cubicRadian) * littleRadius;
+
+                    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', ['M', lastPt[0], lastPt[1], 'C', cubicX, cubicY, cubicX, cubicY, x, y].join(' '));
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('stroke', colors[number]);
+                    graph.appendChild(path);
+                }
+
+                lastPt = [x, y];
+            });
+        </script>
+    </body>
+</html>
