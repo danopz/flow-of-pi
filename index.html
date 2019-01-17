@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
+
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
         <title>Flow of Pi</title>
@@ -17,7 +17,7 @@
                 <div class="col-6"></div>
             </div>
         </div>
-        
+
 
         <script src="pi.js"></script>
         <script>
@@ -75,6 +75,7 @@
 
             var lastPt = null;
             var currStep = -1;
+            var lastNumber = null;
 
             piNumbers.forEach(function (number) {
                 currStep = (currStep + 1) % steps;
@@ -93,12 +94,13 @@
                     var cubicY = halfSize + Math.sin(cubicRadian) * littleRadius;
 
                     var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    path.setAttribute('d', ['M', lastPt[0], lastPt[1], 'C', cubicX, cubicY, cubicX, cubicY, x, y].join(' '));
+                    path.setAttribute('d', ['M', lastPt[0], lastPt[1], 'Q', cubicX, cubicY, x, y].join(' '));
                     path.setAttribute('fill', 'none');
-                    path.setAttribute('stroke', colors[number]);
+                    path.setAttribute('stroke', colors[lastNumber]);
                     graph.appendChild(path);
                 }
 
+                lastNumber = number;
                 lastPt = [x, y];
             });
         </script>
